@@ -67,7 +67,7 @@ func (s *Sequence) Update(dt float64) {
 					s.loopRemaining--
 				}
 				if s.loopRemaining == 0 || remaining == 0 {
-					s.value = s.Tweens[s.index].begin
+					s.value = s.Tweens[s.index].Begin
 					s.isActiveTweenFinished = len(completed) > 0
 					s.isFinished = true
 					return
@@ -89,13 +89,13 @@ func (s *Sequence) Update(dt float64) {
 			}
 			if s.loopRemaining == 0 || remaining == 0 {
 				if s.isReversed {
-					s.value = s.Tweens[s.clampIndex(s.index)].begin
+					s.value = s.Tweens[s.clampIndex(s.index)].Begin
 					s.isActiveTweenFinished = len(completed) > 0
 					s.isFinished = true
 					return
 
 				}
-				s.value = s.Tweens[s.clampIndex(s.index)].end
+				s.value = s.Tweens[s.clampIndex(s.index)].End
 				s.isActiveTweenFinished = len(completed) > 0
 				s.isFinished = true
 				return

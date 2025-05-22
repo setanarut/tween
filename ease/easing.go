@@ -9,8 +9,6 @@ import (
 // It determines how far an easing value will exceed its target before settling, adding a dynamic "back" effect to the transition.
 const backS float64 = 1.70158
 
-// var pi = float64(math.Pi)
-
 // TweenFunc provides an interface used for the easing equation. You can use
 // one of the provided easing functions or provide your own.
 //

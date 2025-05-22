@@ -9,17 +9,17 @@ import (
 func TestNew(t *testing.T) {
 	tw := NewTween(0, 10, 10, ease.Linear)
 
-	if tw.begin != 0 {
-		t.Errorf("expected begin to be %v, got %v", 0, tw.begin)
+	if tw.Begin != 0 {
+		t.Errorf("expected begin to be %v, got %v", 0, tw.Begin)
 	}
-	if tw.end != 10 {
-		t.Errorf("expected end to be %v, got %v", 10, tw.end)
+	if tw.End != 10 {
+		t.Errorf("expected end to be %v, got %v", 10, tw.End)
 	}
-	if tw.change != 10 {
-		t.Errorf("expected change to be %v, got %v", 10, tw.change)
+	if tw.change() != 10 {
+		t.Errorf("expected change to be %v, got %v", 10, tw.change())
 	}
-	if tw.duration != 10 {
-		t.Errorf("expected duration to be %v, got %v", 10, tw.duration)
+	if tw.Duration != 10 {
+		t.Errorf("expected duration to be %v, got %v", 10, tw.Duration)
 	}
 	if tw.time != 0 {
 		t.Errorf("expected time to be %v, got %v", 0, tw.time)

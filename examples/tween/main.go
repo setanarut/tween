@@ -8,13 +8,13 @@ import (
 func main() {
 	t := tween.NewTween(0, 90, 20, ease.InBounce)
 
-	for range int(t.Duration()) {
+	for range int(t.Duration) {
 		t.Update(1)
 		n := int(t.Value())
 		for range n {
 			print("x")
 		}
-		for j := n; j < int(t.End()); j++ {
+		for j := n; j < int(t.End); j++ {
 			print(" ")
 		}
 		print("\n")
