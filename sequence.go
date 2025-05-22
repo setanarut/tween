@@ -17,7 +17,7 @@ type Sequence struct {
 	// loopRemaining is the remaining number of times to loop through the sequence
 	loopRemaining int
 
-	value                 float32
+	value                 float64
 	isActiveTweenFinished bool
 	isFinished            bool
 }
@@ -47,7 +47,7 @@ func (seq *Sequence) Remove(index int) {
 }
 
 // Update updates the currently active Tween in the Sequence; once that Tween is done, the Sequence moves onto the next one.
-func (s *Sequence) Update(dt float32) {
+func (s *Sequence) Update(dt float64) {
 	if !s.HasTweens() {
 		s.value = 0
 		s.isActiveTweenFinished = false
@@ -130,7 +130,7 @@ func (s *Sequence) Update(dt float32) {
 }
 
 // Value returns the current value of the Sequence, which is the value of the currently active Tween.
-func (seq *Sequence) Value() float32 {
+func (seq *Sequence) Value() float64 {
 	return seq.value
 }
 

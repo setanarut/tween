@@ -1,12 +1,41 @@
 # Tween [![](https://godoc.org/github.com/setanarut/tween?status.svg)](http://godoc.org/github.com/setanarut/tween)
 
-
 Tween is a small library to perform [tweening](https://en.wikipedia.org/wiki/Tweening) in Go. It has a minimal
 interface, and it comes with several easing functions.
 
-## Examples
+## Quick start
 
-see [examples](./examples/) folder
+Tween usage
+
+```Go
+	// tween from 0 to 1 in 3 seconds
+	tw := tween.NewTween(0, 1, 3, ease.Linear)
+
+	// advance by 1.5 seconds
+	tw.Update(1.5)
+
+	// get tween value at 1.5 seconds using Value()
+	fmt.Println(tw.Value()) // 0.5
+```
+Sequence usage
+
+```Go
+	// merge multiple tweens into a sequence
+	sequence := tween.NewSequence(
+		tween.NewTween(0, 100, 3, ease.InCubic),
+		tween.NewTween(100, 40, 2, ease.OutCubic),
+		tween.NewTween(4, 100, 20, ease.InOutBounce),
+	)
+
+	// advance by 7.5 seconds
+	sequence.Update(7.5)
+
+	// get sequence value at 7.5 seconds using Value()
+	fmt.Println(sequence.Value()) // 5.3125
+```
+
+
+See [examples](./examples/) folder for more examples.
 
 ## Easing functions
 
@@ -49,7 +78,7 @@ Each family (except `linear`) has 4 variants:
 You are not limited to gween's easing functions; if you pass a function parameter
 in the easing, it will be used.
 
-The passed function will need to suite the TweenFunc interface: `func(t, b, c, d float32) float32`
+The passed function will need to suite the TweenFunc interface: `func(t, b, c, d float64) float64`
 
 * `t` (time): starts in 0 and usually moves towards duration
 * `b` (begin): initial value of the of the property being eased.
@@ -61,7 +90,7 @@ And must return the new value after the interpolation occurs.
 Here's an example using a custom easing.
 
 ```golang
-labelTween := tween.new(0, 300, 4, func(t, b, c, d) float32 {
+labelTween := tween.new(0, 300, 4, func(t, b, c, d) float64 {
   return c*t/d + b // linear ease
 })
 ```

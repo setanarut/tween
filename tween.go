@@ -12,21 +12,21 @@ import (
 type Tween struct {
 	Reverse bool
 
-	time     float32
-	begin    float32
-	end      float32
-	duration float32
+	time     float64
+	begin    float64
+	end      float64
+	duration float64
 	easing   ease.TweenFunc
-	overflow float32
-	change   float32
-	value    float32
+	overflow float64
+	change   float64
+	value    float64
 }
 
 // NewTween will return a new Tween when passed a beginning and end value, the duration
 // of the tween and the easing function to animate between the two values. The
 // easing function can be one of the provided easing functions from the ease package
 // or you can provide one of your own.
-func NewTween(begin, end, duration float32, easing ease.TweenFunc) *Tween {
+func NewTween(begin, end, duration float64, easing ease.TweenFunc) *Tween {
 	return &Tween{
 		begin:    begin,
 		end:      end,
@@ -38,7 +38,7 @@ func NewTween(begin, end, duration float32, easing ease.TweenFunc) *Tween {
 
 // Set will set the current time along the duration of the tween. It will then return
 // the current value as well as a boolean to determine if the tween is finished.
-func (t *Tween) Set(time float32) {
+func (t *Tween) Set(time float64) {
 	switch {
 	case time <= 0.0:
 		t.overflow = time
@@ -56,22 +56,22 @@ func (t *Tween) Set(time float32) {
 }
 
 // Value returns current tween value
-func (t *Tween) Value() float32 {
+func (t *Tween) Value() float64 {
 	return t.value
 }
 
 // End returns end value
-func (t *Tween) End() float32 {
+func (t *Tween) End() float64 {
 	return t.end
 }
 
 // Begin returns begin value
-func (t *Tween) Begin() float32 {
+func (t *Tween) Begin() float64 {
 	return t.begin
 }
 
 // Duration returns duration value
-func (t *Tween) Duration() float32 {
+func (t *Tween) Duration() float64 {
 	return t.duration
 }
 
@@ -92,14 +92,12 @@ func (t *Tween) Reset() {
 	}
 }
 
-// Update will increment the timer of the Tween and ease the value.
+// Update will increment the timer of the Tween and ease the value. Unit is seconds.
 //
-// 25 FPS = 1/25 = 0.04 dt
-//
-// 60 FPS = 1/60 = 0.016666666666666666 dt
-//
-// 120 FPS = 1/120 = 0.008333333333333333 dt
-func (t *Tween) Update(dt float32) {
+//	25 FPS 1 frame increment = 1/25 = 0.04 dt
+//	60 FPS 1 frame increment = 1/60 = 0.016666666666666666 dt
+//	120 FPS 1 frame increment = 1/120 = 0.008333333333333333 dt
+func (t *Tween) Update(dt float64) {
 	if t.Reverse {
 		t.Set(t.time - dt)
 	} else {

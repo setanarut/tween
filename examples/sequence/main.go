@@ -10,6 +10,7 @@ func main() {
 		tween.NewTween(2, 90, 20, ease.InCubic),
 		tween.NewTween(90, 2, 20, ease.OutCubic),
 	)
+
 	for range int(s.Tweens[0].Duration() + s.Tweens[1].Duration()) {
 		s.Update(1)
 		if s.IsFinished() {
