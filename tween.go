@@ -7,22 +7,20 @@ import (
 	"github.com/setanarut/tween/ease"
 )
 
-type (
-	// Tween encapsulates the easing function along with timing data. This allows
-	// a ease.TweenFunc to be used to be easily animated.
-	Tween struct {
-		Reverse bool
+// Tween encapsulates the easing function along with timing data. This allows
+// a ease.TweenFunc to be used to be easily animated.
+type Tween struct {
+	Reverse bool
 
-		time     float32
-		begin    float32
-		end      float32
-		duration float32
-		easing   ease.TweenFunc
-		overflow float32
-		change   float32
-		current  float32
-	}
-)
+	time     float32
+	begin    float32
+	end      float32
+	duration float32
+	easing   ease.TweenFunc
+	overflow float32
+	change   float32
+	value    float32
+}
 
 // NewTween will return a new Tween when passed a beginning and end value, the duration
 // of the tween and the easing function to animate between the two values. The
@@ -45,21 +43,36 @@ func (t *Tween) Set(time float32) {
 	case time <= 0.0:
 		t.overflow = time
 		t.time = 0.0
-		t.current = t.begin
+		t.value = t.begin
 	case time >= t.duration:
 		t.overflow = time - t.duration
 		t.time = t.duration
-		t.current = t.end
+		t.value = t.end
 	default:
 		t.overflow = 0.0
 		t.time = time
-		t.current = t.easing(t.time, t.begin, t.change, t.duration)
+		t.value = t.easing(t.time, t.begin, t.change, t.duration)
 	}
 }
 
-// Current returns current tween value
-func (t *Tween) Current() float32 {
-	return t.current
+// Value returns current tween value
+func (t *Tween) Value() float32 {
+	return t.value
+}
+
+// End returns end value
+func (t *Tween) End() float32 {
+	return t.end
+}
+
+// Begin returns begin value
+func (t *Tween) Begin() float32 {
+	return t.begin
+}
+
+// Duration returns duration value
+func (t *Tween) Duration() float32 {
+	return t.duration
 }
 
 // IsFinished will return true if the tween is finished.

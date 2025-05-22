@@ -106,7 +106,7 @@ func (s *Sequence) Update(dt float32) {
 		}
 		s.Tweens[s.index].Update(remaining)
 		if !s.Tweens[s.index].IsFinished() {
-			s.value = s.Tweens[s.index].Current()
+			s.value = s.Tweens[s.index].Value()
 			s.isActiveTweenFinished = len(completed) > 0
 			s.isFinished = false
 			return
@@ -159,6 +159,12 @@ func (seq *Sequence) SetIndex(index int) {
 }
 
 // SetLoop sets the default loop and the current remaining loops
+//
+// -1 means infinite loops
+//
+// 0 means no loops
+//
+// 1 means one loop
 func (seq *Sequence) SetLoop(amount int) {
 	seq.loop = amount
 	seq.loopRemaining = seq.loop
