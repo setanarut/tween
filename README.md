@@ -1,13 +1,14 @@
 # Tween [![](https://godoc.org/github.com/setanarut/tween?status.svg)](http://godoc.org/github.com/setanarut/tween)
 
-## Examples
-
-see [examples](./examples/) folder
 
 Tween is a small library to perform [tweening](https://en.wikipedia.org/wiki/Tweening) in Go. It has a minimal
 interface, and it comes with several easing functions.
 
-# Easing functions
+## Examples
+
+see [examples](./examples/) folder
+
+## Easing functions
 
 Easing functions are functions that express how slow/fast the interpolation happens in tween.
 
@@ -43,7 +44,7 @@ Each family (except `linear`) has 4 variants:
 | **Bounce**  | InBounce  | OutBounce  | InOutBounce  | OutInBounce  |
 | **Elastic** | InElastic | OutElastic | InOutElastic | OutInElastic |
 
-## Custom easing functions
+### Custom easing functions
 
 You are not limited to gween's easing functions; if you pass a function parameter
 in the easing, it will be used.
