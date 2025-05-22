@@ -93,6 +93,12 @@ func (t *Tween) Reset() {
 }
 
 // Update will increment the timer of the Tween and ease the value.
+//
+// 25 FPS = 1/25 = 0.04 dt
+//
+// 60 FPS = 1/60 = 0.016666666666666666 dt
+//
+// 120 FPS = 1/120 = 0.008333333333333333 dt
 func (t *Tween) Update(dt float32) {
 	if t.Reverse {
 		t.Set(t.time - dt)

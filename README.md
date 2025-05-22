@@ -1,6 +1,10 @@
 # Tween [![](https://godoc.org/github.com/setanarut/tween?status.svg)](http://godoc.org/github.com/setanarut/tween)
 
-Tween is a small library to perform [tweening](http://en.wikipedia.org/wiki/Tweening) in Go. It has a minimal
+## Examples
+
+see [examples](./examples/) folder
+
+Tween is a small library to perform [tweening](https://en.wikipedia.org/wiki/Tweening) in Go. It has a minimal
 interface, and it comes with several easing functions.
 
 # Easing functions

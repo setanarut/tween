@@ -1,11 +1,16 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/setanarut/tween"
 	"github.com/setanarut/tween/ease"
 )
 
 func main() {
+	fmt.Println(1. / 25)
+	fmt.Println(1. / 60.)
+	fmt.Println(1. / 120.)
 	var s = tween.NewSequence(
 		tween.NewTween(2, 90, 20, ease.InCubic),
 		tween.NewTween(90, 2, 20, ease.OutCubic),
