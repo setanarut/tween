@@ -89,7 +89,7 @@ And must return the new value after the interpolation occurs.
 Here's an example using a custom easing.
 
 ```golang
-labelTween := tween.new(0, 300, 4, func(t, b, c, d) float64 {
+tw := tween.NewTween(0, 300, 4, func(t, b, c, d) float64 {
   return c*t/d + b // linear ease
 })
 ```
