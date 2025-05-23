@@ -207,7 +207,7 @@ func TestSequence_Yoyos(t *testing.T) {
 		NewTween(2, 3, 1, ease.Linear),
 	)
 
-	seq.YoyoEnabled = true
+	seq.Yoyo = true
 	seq.Update(5.75)
 	if seq.Value() != float64(0.25) {
 		t.Errorf("expected current to be %v, got %v", float64(0.25), seq.Value())
@@ -249,7 +249,7 @@ func TestSequence_YoyosAndLoops(t *testing.T) {
 		NewTween(1, 2, 1, ease.Linear),
 		NewTween(2, 3, 1, ease.Linear),
 	)
-	seq.YoyoEnabled = true
+	seq.Yoyo = true
 	seq.SetLoop(2)
 	seq.Update(7.25)
 	if seq.Value() != float64(1.25) {
@@ -312,7 +312,7 @@ func TestSequence_SetReverse(t *testing.T) {
 		t.Errorf("expected index to be %v, got %v", 2, seq.index)
 	}
 
-	seq.SetReverse(true)
+	seq.SetReversed(true)
 
 	// Goes in reverse
 	seq.Update(2.0)
@@ -384,7 +384,7 @@ func TestSequence_SetReverseWithYoyo(t *testing.T) {
 		NewTween(1, 2, 1, ease.Linear),
 		NewTween(2, 3, 1, ease.Linear),
 	)
-	seq.YoyoEnabled = true
+	seq.Yoyo = true
 	seq.SetLoop(2)
 
 	// Standard operation
@@ -405,7 +405,7 @@ func TestSequence_SetReverseWithYoyo(t *testing.T) {
 		t.Errorf("expected index to be %v, got %v", 2, seq.index)
 	}
 
-	seq.SetReverse(true)
+	seq.SetReversed(true)
 
 	// Goes in reverse
 	seq.Update(2.0)
@@ -464,7 +464,7 @@ func TestSequence_SetReverseWithYoyo(t *testing.T) {
 		t.Errorf("expected Reverse() to be true, got %v", seq.IsReversed())
 	}
 
-	seq.SetReverse(false) // Go forward instead
+	seq.SetReversed(false) // Go forward instead
 
 	// Hits the end again, yoyos the same
 	seq.Update(1.5)
@@ -529,7 +529,7 @@ func TestSequence_SetReverseAfterComplete(t *testing.T) {
 		t.Errorf("expected index to be %v, got %v", 3, seq.index)
 	}
 
-	seq.SetReverse(true)
+	seq.SetReversed(true)
 	seq.SetLoop(1)
 
 	// Goes in reverse

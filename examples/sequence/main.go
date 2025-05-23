@@ -6,17 +6,16 @@ import (
 )
 
 func main() {
-	var s = tween.NewSequence(
+	var seq = tween.NewSequence(
 		tween.NewTween(2, 90, 20, ease.InCubic),
 		tween.NewTween(90, 2, 20, ease.OutCubic),
 	)
-
-	for range int(s.Tweens[0].Duration + s.Tweens[1].Duration) {
-		s.Update(1)
-		if s.IsFinished() {
+	for range int(seq.Duration()) {
+		seq.Update(1)
+		if seq.IsFinished() {
 			break
 		}
-		n := int(s.Value())
+		n := int(seq.Value())
 		for range n {
 			print("x")
 		}

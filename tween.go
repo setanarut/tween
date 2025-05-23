@@ -14,12 +14,12 @@ type Tween struct {
 	End      float64        // End value of the tween
 	Duration float64        // Duration of the tween
 	Easing   ease.TweenFunc // Easing function to use
-	Reverse  bool           // Reverse will reverse the tween
+	Reversed bool           // Reversed will reverse the tween
+	Yoyo     bool           // Enable yoyo
 
 	time     float64 // Current time
 	overflow float64 // Time overflow is the time that is left over
 	value    float64 // Value is the current value of the tween
-
 }
 
 // NewTween will return a new Tween when passed a beginning and end value, the duration
@@ -35,8 +35,8 @@ func NewTween(begin, end, duration float64, easing ease.TweenFunc) *Tween {
 	}
 }
 
-// Set will set the current time along the duration of the tween.
-func (t *Tween) Set(time float64) {
+// SetTime will set the current time along the duration of the tween.
+func (t *Tween) SetTime(time float64) {
 	switch {
 	case time <= 0.0:
 		t.overflow = time
@@ -58,6 +58,18 @@ func (t *Tween) Value() float64 {
 	return t.value
 }
 
+// SetYoyo sets yoyo and returns self
+func (t *Tween) SetYoyo(y bool) *Tween {
+	t.Yoyo = y
+	return t
+}
+
+// SetReversed sets Reversed and returns self
+func (t *Tween) SetReversed(r bool) *Tween {
+	t.Reversed = r
+	return t
+}
+
 // change is the difference between the end and begin values
 func (t *Tween) change() float64 {
 	return t.End - t.Begin
@@ -65,19 +77,21 @@ func (t *Tween) change() float64 {
 
 // IsFinished will return true if the tween is finished.
 func (t *Tween) IsFinished() bool {
-	if t.Reverse {
+	if t.Reversed {
 		return t.time <= 0.0
+	} else {
+		return t.time >= t.Duration
 	}
-	return t.time >= t.Duration
 }
 
 // Reset will set the Tween to the beginning of the two values.
-func (t *Tween) Reset() {
-	if t.Reverse {
-		t.Set(t.Duration)
+func (t *Tween) Reset() *Tween {
+	if t.Reversed {
+		t.SetTime(t.Duration)
 	} else {
-		t.Set(0.0)
+		t.SetTime(0.0)
 	}
+	return t
 }
 
 // Update will increment the timer of the Tween and ease the value. Unit is seconds.
@@ -86,9 +100,15 @@ func (t *Tween) Reset() {
 //	60 FPS 1 frame increment = 1/60 = 0.016666666666666666 dt
 //	120 FPS 1 frame increment = 1/120 = 0.008333333333333333 dt
 func (t *Tween) Update(dt float64) {
-	if t.Reverse {
-		t.Set(t.time - dt)
+	if t.Reversed {
+		t.SetTime(t.time - dt)
 	} else {
-		t.Set(t.time + dt)
+		t.SetTime(t.time + dt)
+	}
+
+	if t.Yoyo {
+		if t.IsFinished() {
+			t.Reversed = !t.Reversed
+		}
 	}
 }
