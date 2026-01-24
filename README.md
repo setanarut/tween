@@ -9,7 +9,7 @@ Tween usage
 
 ```Go
 // tween from 0 to 1 in 3 seconds
-tw := tween.NewTween(0, 1, 3, ease.Linear)
+tw := tween.NewTween(0, 1, 3, tween.Linear)
 
 // advance by 1.5 seconds
 tw.Update(1.5)
@@ -22,9 +22,9 @@ Sequence usage
 ```Go
 // merge multiple tweens into a sequence
 sequence := tween.NewSequence(
-	tween.NewTween(0, 100, 3, ease.InCubic),
-	tween.NewTween(100, 40, 2, ease.OutCubic),
-	tween.NewTween(4, 100, 20, ease.InOutBounce),
+	tween.NewTween(0, 100, 3, tween.InCubic),
+	tween.NewTween(100, 40, 2, tween.OutCubic),
+	tween.NewTween(4, 100, 20, tween.InOutBounce),
 )
 
 // advance by 7.5 seconds
@@ -71,29 +71,3 @@ Each family (except `linear`) has 4 variants:
 | **Back**    | InBack    | OutBack    | InOutBack    | OutInBack    |
 | **Bounce**  | InBounce  | OutBounce  | InOutBounce  | OutInBounce  |
 | **Elastic** | InElastic | OutElastic | InOutElastic | OutInElastic |
-
-### Custom easing functions
-
-You are not limited to gween's easing functions; if you pass a function parameter
-in the easing, it will be used.
-
-The passed function will need to suite the TweenFunc interface: `func(t, b, c, d float64) float64`
-
-* `t` (time): starts in 0 and usually moves towards duration
-* `b` (begin): initial value of the of the property being eased.
-* `c` (change): ending value of the property - starting value of the property
-* `d` (duration): total duration of the tween
-
-And must return the new value after the interpolation occurs.
-
-Here's an example using a custom easing.
-
-```golang
-tw := tween.NewTween(0, 300, 4, func(t, b, c, d) float64 {
-  return c*t/d + b // linear ease
-})
-```
-
-## Credits
-
-tween is an independent fork of the [gween](https://github.com/tanema/gween) package. The API is different.

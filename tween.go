@@ -4,84 +4,91 @@
 package tween
 
 import (
-	"github.com/setanarut/tween/ease"
+	"encoding/json"
+	"time"
 )
 
 // Tween encapsulates the easing function along with timing data. This allows
-// a ease.TweenFunc to be used to be easily animated.
+// a TweenFunc to be used to be easily animated.
 type Tween struct {
-	Begin    float64        // Begin value of the tween
-	End      float64        // End value of the tween
-	Duration float64        // Duration of the tween
-	Easing   ease.TweenFunc // Easing function to use
-	Reversed bool           // Reversed will reverse the tween
-	Yoyo     bool           // Enable yoyo
+	Begin    float64
+	End      float64
+	Duration time.Duration
+	Time     time.Duration
+	Overflow time.Duration
+	Value    float64
 
-	time     float64 // Current time
-	overflow float64 // Time overflow is the time that is left over
-	value    float64 // Value is the current value of the tween
+	Reversed bool
+	Yoyo     bool
+
+	// EasingFunc function to use
+	EasingFunc TweenFunc `json:"-"`
+	EaseName   string
 }
 
 // NewTween will return a new Tween when passed a beginning and end value, the duration
-// of the tween and the easing function to animate between the two values. The
-// easing function can be one of the provided easing functions from the ease package
-// or you can provide one of your own.
-func NewTween(begin, end, duration float64, easing ease.TweenFunc) *Tween {
-	return &Tween{
-		Begin:    begin,
-		End:      end,
-		Duration: duration,
-		Easing:   easing,
+// of the tween and the easing function to animate between the two values.
+func NewTween(begin, end float64, duration time.Duration, easeName string, yoyo bool) *Tween {
+	fn, ok := EaseMap[easeName]
+	if !ok {
+		fn = LinearFunc
 	}
+	return &Tween{
+		Begin:      begin,
+		End:        end,
+		Duration:   duration,
+		EasingFunc: fn,
+		EaseName:   easeName,
+		Yoyo:       yoyo,
+	}
+}
+
+func (t *Tween) UnmarshalJSON(data []byte) error {
+	type Alias Tween
+	aux := &Alias{
+		EasingFunc: LinearFunc,
+	}
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+	*t = Tween(*aux)
+	if fn, ok := EaseMap[t.EaseName]; ok {
+		t.EasingFunc = fn
+	} else {
+		t.EasingFunc = LinearFunc
+	}
+	return nil
 }
 
 // SetTime will set the current time along the duration of the tween.
-func (t *Tween) SetTime(time float64) {
+func (t *Tween) SetTime(currentTime time.Duration) {
 	switch {
-	case time <= 0.0:
-		t.overflow = time
-		t.time = 0.0
-		t.value = t.Begin
-	case time >= t.Duration:
-		t.overflow = time - t.Duration
-		t.time = t.Duration
-		t.value = t.End
+	case currentTime <= 0:
+		t.Overflow = currentTime
+		t.Time = 0
+		t.Value = t.Begin
+	case currentTime >= t.Duration:
+		t.Overflow = currentTime - t.Duration
+		t.Time = t.Duration
+		t.Value = t.End
 	default:
-		t.overflow = 0.0
-		t.time = time
-		t.value = t.Easing(t.time, t.Begin, t.change(), t.Duration)
+		t.Overflow = 0
+		t.Time = currentTime
+		t.Value = t.EasingFunc(t.Time.Seconds(), t.Begin, t.Change(), t.Duration.Seconds())
 	}
 }
 
-// Value returns current tween value
-func (t *Tween) Value() float64 {
-	return t.value
-}
-
-// SetYoyo sets yoyo and returns self
-func (t *Tween) SetYoyo(y bool) *Tween {
-	t.Yoyo = y
-	return t
-}
-
-// SetReversed sets Reversed and returns self
-func (t *Tween) SetReversed(r bool) *Tween {
-	t.Reversed = r
-	return t
-}
-
-// change is the difference between the end and begin values
-func (t *Tween) change() float64 {
+// Change is the difference between the end and begin values
+func (t *Tween) Change() float64 {
 	return t.End - t.Begin
 }
 
 // IsFinished will return true if the tween is finished.
 func (t *Tween) IsFinished() bool {
 	if t.Reversed {
-		return t.time <= 0.0
-	} else {
-		return t.time >= t.Duration
+		return t.Time <= 0
 	}
+	return t.Time >= t.Duration
 }
 
 // Reset will set the Tween to the beginning of the two values.
@@ -89,26 +96,29 @@ func (t *Tween) Reset() *Tween {
 	if t.Reversed {
 		t.SetTime(t.Duration)
 	} else {
-		t.SetTime(0.0)
+		t.SetTime(0)
 	}
 	return t
 }
-
-// Update will increment the timer of the Tween and ease the value. Unit is seconds.
-//
-//	25 FPS 1 frame increment = 1/25 = 0.04 dt
-//	60 FPS 1 frame increment = 1/60 = 0.016666666666666666 dt
-//	120 FPS 1 frame increment = 1/120 = 0.008333333333333333 dt
-func (t *Tween) Update(dt float64) {
+func (t *Tween) Update(dt time.Duration) {
 	if t.Reversed {
-		t.SetTime(t.time - dt)
+		t.SetTime(t.Time - dt)
 	} else {
-		t.SetTime(t.time + dt)
+		t.SetTime(t.Time + dt)
 	}
 
-	if t.Yoyo {
-		if t.IsFinished() {
-			t.Reversed = !t.Reversed
+	if t.Yoyo && t.IsFinished() {
+		over := t.Overflow
+		if over < 0 {
+			over = -over
+		}
+
+		t.Reversed = !t.Reversed
+
+		if t.Reversed {
+			t.SetTime(t.Duration - over)
+		} else {
+			t.SetTime(over)
 		}
 	}
 }

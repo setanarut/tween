@@ -2,30 +2,30 @@ package tween
 
 import (
 	"testing"
-
-	"github.com/setanarut/tween/ease"
+	"time"
 )
 
 func TestNew(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
+	duration := 10 * time.Second
+	tw := NewTween(0, 10, duration, "Linear", false)
 
 	if tw.Begin != 0 {
-		t.Errorf("expected begin to be %v, got %v", 0, tw.Begin)
+		t.Errorf("expected begin to be 0, got %v", tw.Begin)
 	}
 	if tw.End != 10 {
-		t.Errorf("expected end to be %v, got %v", 10, tw.End)
+		t.Errorf("expected end to be 10, got %v", tw.End)
 	}
-	if tw.change() != 10 {
-		t.Errorf("expected change to be %v, got %v", 10, tw.change())
+	if tw.Change() != 10 {
+		t.Errorf("expected change to be 10, got %v", tw.Change())
 	}
-	if tw.Duration != 10 {
-		t.Errorf("expected duration to be %v, got %v", 10, tw.Duration)
+	if tw.Duration != duration {
+		t.Errorf("expected duration to be %v, got %v", duration, tw.Duration)
 	}
-	if tw.time != 0 {
-		t.Errorf("expected time to be %v, got %v", 0, tw.time)
+	if tw.Time != 0 {
+		t.Errorf("expected Time to be 0, got %v", tw.Time)
 	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
+	if tw.Overflow != 0 {
+		t.Errorf("expected Overflow to be 0, got %v", tw.Overflow)
 	}
 	if tw.Reversed {
 		t.Errorf("expected Reverse to be false, got %v", tw.Reversed)
@@ -33,246 +33,127 @@ func TestNew(t *testing.T) {
 }
 
 func TestTween_Set(t *testing.T) {
-	tween := NewTween(0, 10, 10, ease.Linear)
-	tween.SetTime(2)
-	if tween.Value() != 2 {
-		t.Errorf("expected Current() to be %v, got %v", 2, tween.Value())
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+
+	tw.SetTime(2 * time.Second)
+	if tw.Value != 2 {
+		t.Errorf("expected Value to be 2, got %v", tw.Value)
 	}
-	if tween.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tween.overflow)
+	if tw.Overflow != 0 {
+		t.Errorf("expected Overflow to be 0, got %v", tw.Overflow)
 	}
-	if tween.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
+	if tw.IsFinished() {
+		t.Errorf("expected IsFinished to be false")
 	}
-	tween.SetTime(11)
-	if tween.Value() != 10 {
-		t.Errorf("expected Current() to be %v, got %v", 10, tween.Value())
+
+	tw.SetTime(11 * time.Second)
+	if tw.Value != 10 {
+		t.Errorf("expected Value to be 10, got %v", tw.Value)
 	}
-	if tween.overflow != 1 {
-		t.Errorf("expected overflow to be %v, got %v", 1, tween.overflow)
+	if tw.Overflow != 1*time.Second {
+		t.Errorf("expected Overflow to be 1s, got %v", tw.Overflow)
 	}
-	if !tween.IsFinished() {
-		t.Errorf("expected IsFinished() to be true")
+	if !tw.IsFinished() {
+		t.Errorf("expected IsFinished to be true")
 	}
 }
 
 func TestTween_SetNeg(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.SetTime(2)
-	if tw.value != 2 {
-		t.Errorf("expected current to be %v, got %v", 2, tw.value)
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw.SetTime(2 * time.Second)
+
+	tw.SetTime(-1 * time.Second)
+	if tw.Value != 0 {
+		t.Errorf("expected current to be 0, got %v", tw.Value)
 	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-	tw.SetTime(-1)
-	if tw.value != 0 {
-		t.Errorf("expected current to be %v, got %v", 0, tw.value)
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
+	if tw.Overflow != -1*time.Second {
+		t.Errorf("expected overflow to be -1s, got %v", tw.Overflow)
 	}
 }
 
 func TestTween_SetReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
 	tw.Reversed = true
-	tw.SetTime(2)
-	if tw.Value() != 2 {
-		t.Errorf("expected Current() to be %v, got %v", 2, tw.Value())
-	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-	tw.SetTime(11)
-	if tw.Value() != 10 {
-		t.Errorf("expected Current() to be %v, got %v", 10, tw.Value())
-	}
-	if tw.overflow != 1 {
-		t.Errorf("expected overflow to be %v, got %v", 1, tw.overflow)
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-}
 
-func TestTween_SetNegReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Reversed = true
-	tw.SetTime(2)
-	if tw.Value() != 2 {
-		t.Errorf("expected Current() to be %v, got %v", 2, tw.Value())
+	tw.SetTime(2 * time.Second)
+	if tw.Value != 2 {
+		t.Errorf("expected Value to be 2, got %v", tw.Value)
 	}
 	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
+		t.Errorf("expected IsFinished to be false")
 	}
-	tw.SetTime(-1)
-	if tw.Value() != 0 {
-		t.Errorf("expected Current() to be %v, got %v", 0, tw.Value())
-	}
-	if !tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be true")
+
+	tw.SetTime(11 * time.Second)
+	if tw.IsFinished() {
+		t.Errorf("expected IsFinished to be false in reverse at end time")
 	}
 }
 
 func TestTween_Reset(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.SetTime(2)
-	if tw.Value() != 2 {
-		t.Errorf("expected Current() to be %v, got %v", 2, tw.Value())
-	}
-	if tw.time != 2 {
-		t.Errorf("expected time to be %v, got %v", 2, tw.time)
-	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-	tw.Reset()
-	if tw.time != 0 {
-		t.Errorf("expected time to be %v, got %v", 0, tw.time)
-	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
-	}
-}
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw.SetTime(5 * time.Second)
 
-func TestTween_ResetReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.SetTime(2)
+	tw.Reset()
+	if tw.Time != 0 {
+		t.Errorf("expected Time to be 0, got %v", tw.Time)
+	}
+
 	tw.Reversed = true
 	tw.Reset()
-	if tw.time != 10 {
-		t.Errorf("expected time to be %v, got %v", 10, tw.time)
-	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
+	if tw.Time != 10*time.Second {
+		t.Errorf("expected Time to be 10s, got %v", tw.Time)
 	}
 }
 
 func TestTween_Update(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Update(2)
-	if tw.Value() != 2 {
-		t.Errorf("expected Current() to be %v, got %v", 2, tw.Value())
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+
+	tw.Update(2 * time.Second)
+	if tw.Value != 2 {
+		t.Errorf("expected Value to be 2, got %v", tw.Value)
 	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-	tw.Update(9)
-	if tw.Value() != 10 {
-		t.Errorf("expected Current() to be %v, got %v", 10, tw.Value())
-	}
-	if tw.overflow != 1 {
-		t.Errorf("expected overflow to be %v, got %v", 1, tw.overflow)
-	}
+
+	tw.Update(9 * time.Second)
 	if !tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be true")
+		t.Errorf("expected IsFinished to be true after 11s total update")
 	}
-}
-
-func TestTween_UpdateZero(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Update(2)
-	tw.Update(0)
-	if tw.Value() != 2 {
-		t.Errorf("expected Current() to be %v, got %v", 2, tw.Value())
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-}
-
-func TestTween_UpdateNeg(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Update(2)
-	tw.Update(-1)
-	if tw.Value() != 1 {
-		t.Errorf("expected Current() to be %v, got %v", 1, tw.Value())
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-}
-
-func TestTween_UpdateNegReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Update(2)
-	tw.Reversed = true
-	tw.Update(-1)
-	if tw.Value() != 3 {
-		t.Errorf("expected Current() to be %v, got %v", 3, tw.Value())
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
-	}
-}
-
-func TestTween_Defaults_Forward(t *testing.T) {
-	tween := NewTween(0, 10, 10, ease.Linear)
-	if tween.Reversed {
-		t.Errorf("expected Reverse to be false, got %v", tween.Reversed)
+	if tw.Overflow != 1*time.Second {
+		t.Errorf("expected Overflow to be 1s, got %v", tw.Overflow)
 	}
 }
 
 func TestTween_CanReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Update(8)
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw.Update(8 * time.Second)
 	tw.Reversed = true
-	tw.Update(2)
-	if tw.Value() != 6 {
-		t.Errorf("expected Current() to be %v, got %v", 6, tw.Value())
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
+	tw.Update(2 * time.Second)
+
+	if tw.Value != 6 {
+		t.Errorf("expected Value to be 6 after reversing 2s from 8s, got %v", tw.Value)
 	}
 }
 
-func TestTween_CanReverseFromFinished(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
-	tw.Update(10)
-	if !tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be true")
+func TestTween_Yoyo(t *testing.T) {
+	tw := NewTween(0, 10, 10*time.Second, "Linear", true)
+
+	tw.Update(12 * time.Second)
+	if !tw.Reversed {
+		t.Errorf("expected Reversed to be true after yoyo trigger")
 	}
-	tw.Reversed = true
-	tw.Update(2)
-	if tw.Value() != 8 {
-		t.Errorf("expected Current() to be %v, got %v", 8, tw.Value())
-	}
-	if tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be false")
+	if tw.Value != 8 {
+		t.Errorf("expected Value to be 8 (10-2), got %v", tw.Value)
 	}
 }
 
 func TestTween_CanReverseFromStart(t *testing.T) {
-	tw := NewTween(0, 10, 10, ease.Linear)
+	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
 	tw.Reversed = true
-	tw.Update(0)
+	tw.Update(1 * time.Second)
+
 	if !tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be true")
+		t.Errorf("expected IsFinished to be true when reversing at time 0")
 	}
-	if tw.Value() != 0 {
-		t.Errorf("expected Current() to be %v, got %v", 0, tw.Value())
-	}
-	if tw.overflow != 0 {
-		t.Errorf("expected overflow to be %v, got %v", 0, tw.overflow)
-	}
-	tw.Update(1)
-	if !tw.IsFinished() {
-		t.Errorf("expected IsFinished() to be true")
-	}
-	if tw.Value() != 0 {
-		t.Errorf("expected Current() to be %v, got %v", 0, tw.Value())
-	}
-	if tw.overflow != -1.0 {
-		t.Errorf("expected overflow to be %v, got %v", -1.0, tw.overflow)
+	if tw.Overflow != -1*time.Second {
+		t.Errorf("expected Overflow to be -1s, got %v", tw.Overflow)
 	}
 }

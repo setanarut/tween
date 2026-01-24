@@ -1,16 +1,17 @@
 package main
 
 import (
+	"time"
+
 	"github.com/setanarut/tween"
-	"github.com/setanarut/tween/ease"
 )
 
 func main() {
-	t := tween.NewTween(0, 90, 20, ease.InBounce)
+	t := tween.NewTween(0, 90, time.Second*20, tween.InBounce, false)
 
-	for range int(t.Duration) {
-		t.Update(1)
-		n := int(t.Value())
+	for range 20 {
+		t.Update(time.Second)
+		n := int(t.Value)
 		for range n {
 			print("x")
 		}

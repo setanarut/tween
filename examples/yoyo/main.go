@@ -2,36 +2,36 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/setanarut/tween"
-	"github.com/setanarut/tween/ease"
 )
 
 // Yoyo example
 func main() {
 
 	// Create Tween and enable Yoyo
-	tw := tween.NewTween(0, 5, 5, ease.Linear).SetYoyo(true)
+	tw := tween.NewTween(0, 10, time.Second*10, tween.Linear, true)
 	for range 20 {
-		fmt.Print(tw.Value())
+		fmt.Print(tw.Value)
 		fmt.Print(" ")
-		tw.Update(1)
+		tw.Update(time.Second)
 	}
 
-	// 0 1 2 3 4 5 4 3 2 1 0 1 2 3 4 5 4 3 2 1
+	// 0 1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1
 
 	fmt.Print("\n")
 
 	// Disable yoyo and reset
-	tw.Yoyo = false // or tw.SetYoyo(false)
+	tw.Yoyo = false
 	tw.Reset()
 
 	for range 20 {
-		fmt.Print(tw.Value())
+		fmt.Print(tw.Value)
 		fmt.Print(" ")
-		tw.Update(1)
+		tw.Update(time.Second)
 	}
-	// 0 1 2 3 4 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5
+	// 0 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10
 
 	fmt.Print("\n")
 }

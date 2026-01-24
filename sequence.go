@@ -1,6 +1,9 @@
 package tween
 
-import "slices"
+import (
+	"slices"
+	"time"
+)
 
 // Sequence represents a sequence of Tweens, executed one after the other.
 type Sequence struct {
@@ -8,18 +11,18 @@ type Sequence struct {
 	// Yoyo makes the sequence "Yoyo" back to the beginning after it reaches the end
 	Yoyo bool
 
-	// Reversed runs the sequence backwards when true
-	Reversed bool
+	// IsReversed runs the sequence backwards when true
+	IsReversed bool
 
-	index int
-	// loop is the initial number of loops for this sequence to make
-	loop int
-	// loopRemaining is the remaining number of times to loop through the sequence
-	loopRemaining int
+	Index int
+	// Loop is the initial number of loops for this sequence to make
+	Loop int
+	// LoopRemaining is the remaining number of times to loop through the sequence
+	LoopRemaining int
 
-	value                 float64
-	isActiveTweenFinished bool
-	isFinished            bool
+	Value                 float64
+	IsActiveTweenFinished bool
+	IsFinished            bool
 }
 
 // NewSequence returns a new Sequence object.
@@ -27,9 +30,9 @@ func NewSequence(tweens ...*Tween) *Sequence {
 	seq := &Sequence{
 		Tweens:        tweens,
 		Yoyo:          false,
-		Reversed:      false,
-		loopRemaining: 1,
-		loop:          1,
+		IsReversed:    false,
+		LoopRemaining: 1,
+		Loop:          1,
 	}
 	return seq
 }
@@ -47,11 +50,11 @@ func (s *Sequence) Remove(index int) {
 }
 
 // Update updates the currently active Tween in the Sequence; once that Tween is done, the Sequence moves onto the next one.
-func (s *Sequence) Update(dt float64) {
+func (s *Sequence) Update(dt time.Duration) {
 	if !s.HasTweens() {
-		s.value = 0
-		s.isActiveTweenFinished = false
-		s.isFinished = true
+		s.Value = 0
+		s.IsActiveTweenFinished = false
+		s.IsFinished = true
 		return
 	}
 	var completed []int
@@ -59,137 +62,104 @@ func (s *Sequence) Update(dt float64) {
 
 	for {
 		if s.Yoyo {
-			if s.index < 0 {
-				// Out of bounds at beginnning, loop
-				s.Reversed = false
-				s.index = s.clampIndex(s.index)
-				if s.loopRemaining >= 1 {
-					s.loopRemaining--
+			if s.Index < 0 {
+				s.IsReversed = false
+				s.Index = s.clampIndex(s.Index)
+				if s.LoopRemaining >= 1 {
+					s.LoopRemaining--
 				}
-				if s.loopRemaining == 0 || remaining == 0 {
-					s.value = s.Tweens[s.index].Begin
-					s.isActiveTweenFinished = len(completed) > 0
-					s.isFinished = true
+				if s.LoopRemaining == 0 || remaining == 0 {
+					s.Value = s.Tweens[s.Index].Begin
+					s.IsActiveTweenFinished = len(completed) > 0
+					s.IsFinished = true
 					return
 				}
-				s.Tweens[s.index].Reversed = s.IsReversed()
-				s.Tweens[s.index].Reset()
+				s.Tweens[s.Index].Reversed = s.IsReversed
+				s.Tweens[s.Index].Reset()
 			}
-			if s.index >= len(s.Tweens) {
-				// Out of bounds at end, yoyo
-				s.Reversed = true
-				s.index = s.clampIndex(s.index)
-				s.Tweens[s.index].Reversed = s.IsReversed()
-				s.Tweens[s.index].Reset()
+			if s.Index >= len(s.Tweens) {
+				s.IsReversed = true
+				s.Index = s.clampIndex(s.Index)
+				s.Tweens[s.Index].Reversed = s.IsReversed
+				s.Tweens[s.Index].Reset()
 			}
-		} else if s.index >= len(s.Tweens) || s.index <= -1 {
-			// out of bounds at either end, loop
-			if s.loopRemaining >= 1 {
-				s.loopRemaining--
+		} else if s.Index >= len(s.Tweens) || s.Index <= -1 {
+			if s.LoopRemaining >= 1 {
+				s.LoopRemaining--
 			}
-			if s.loopRemaining == 0 || remaining == 0 {
-				if s.Reversed {
-					s.value = s.Tweens[s.clampIndex(s.index)].Begin
-					s.isActiveTweenFinished = len(completed) > 0
-					s.isFinished = true
+			if s.LoopRemaining == 0 || remaining == 0 {
+				if s.IsReversed {
+					s.Value = s.Tweens[s.clampIndex(s.Index)].Begin
+					s.IsActiveTweenFinished = len(completed) > 0
+					s.IsFinished = true
 					return
 
 				}
-				s.value = s.Tweens[s.clampIndex(s.index)].End
-				s.isActiveTweenFinished = len(completed) > 0
-				s.isFinished = true
+				s.Value = s.Tweens[s.clampIndex(s.Index)].End
+				s.IsActiveTweenFinished = len(completed) > 0
+				s.IsFinished = true
 				return
 			}
-			s.index = s.wrapIndex(s.index)
-			s.Tweens[s.index].Reversed = s.IsReversed()
-			s.Tweens[s.index].Reset()
+			s.Index = s.wrapIndex(s.Index)
+			s.Tweens[s.Index].Reversed = s.IsReversed
+			s.Tweens[s.Index].Reset()
 		}
-		s.Tweens[s.index].Update(remaining)
-		if !s.Tweens[s.index].IsFinished() {
-			s.value = s.Tweens[s.index].Value()
-			s.isActiveTweenFinished = len(completed) > 0
-			s.isFinished = false
+		s.Tweens[s.Index].Update(remaining)
+		if !s.Tweens[s.Index].IsFinished() {
+			s.Value = s.Tweens[s.Index].Value
+			s.IsActiveTweenFinished = len(completed) > 0
+			s.IsFinished = false
 			return
 		}
-		remaining = s.Tweens[s.index].overflow
-		completed = append(completed, s.index)
+		remaining = s.Tweens[s.Index].Overflow
+		completed = append(completed, s.Index)
 		if remaining < 0 {
 			remaining *= -1
 		}
-		if s.Reversed {
-			s.index--
+		if s.IsReversed {
+			s.Index--
 		} else {
-			s.index++
+			s.Index++
 		}
-		// On the way back, tweens need to be configured to not go forward
-		if s.index < len(s.Tweens) && s.index >= 0 {
-			s.Tweens[s.index].Reversed = s.IsReversed()
-			s.Tweens[s.index].Reset()
+		if s.Index < len(s.Tweens) && s.Index >= 0 {
+			s.Tweens[s.Index].Reversed = s.IsReversed
+			s.Tweens[s.Index].Reset()
 		}
 	}
-}
-
-// Value returns the current value of the Sequence, which is the value of the currently active Tween.
-func (s *Sequence) Value() float64 {
-	return s.value
 }
 
 // Duration calculates and returns the total duration of the Sequence by summing the durations of all Tweens.
-func (s *Sequence) Duration() float64 {
+func (s *Sequence) Duration() time.Duration {
 	if s.HasTweens() {
-		var total float64
-		for _, tween := range s.Tweens {
-			total += tween.Duration
+		var total time.Duration
+		for _, t := range s.Tweens {
+			total += t.Duration
 		}
 		return total
-	} else {
-		return 0
 	}
+	return 0
 }
 
-// IsActiveTweenFinished returns whether the currently active Tween is finished.
-func (s *Sequence) IsActiveTweenFinished() bool {
-	return s.isActiveTweenFinished
-}
-
-// IsFinished returns whether the entire Sequence is finished.
-// This is true when all Tweens in the Sequence are finished and the Sequence has no remaining loops.
-// If the Sequence is set to loop infinitely, this will always return false.
-func (s *Sequence) IsFinished() bool {
-	return s.isFinished
-}
-
-// Index returns the current index of the Sequence. Note that this can exceed the number of Tweens in the Sequence.
-func (s *Sequence) Index() int {
-	return s.index
-}
-
-// SetIndex sets the current index of the Sequence, influencing which Tween is active at any given time.
+// SetIndex sets the current index of the Sequence.
 func (s *Sequence) SetIndex(index int) {
-	s.Tweens[s.index].Reversed = s.IsReversed()
-	s.Tweens[s.index].Reset()
-	s.index = index
+	s.Tweens[s.Index].Reversed = s.IsReversed
+	s.Tweens[s.Index].Reset()
+	s.Index = index
 }
 
-// SetLoop sets the default loop and the current remaining loops
-//
-// -1 means infinite loops
-//
-// 0 means no loops
-//
-// 1 means one loop
+// SetLoop sets the default loop and the current remaining loops.
 func (s *Sequence) SetLoop(amount int) {
-	s.loop = amount
-	s.loopRemaining = s.loop
+	s.Loop = amount
+	s.LoopRemaining = s.Loop
 }
 
 // Reset resets the Sequence, resetting all Tweens and setting the Sequence's index back to 0.
 func (seq *Sequence) Reset() {
-	seq.loopRemaining = seq.loop
+	seq.LoopRemaining = seq.Loop
 	for _, tween := range seq.Tweens {
 		tween.Reset()
 	}
-	seq.index = 0
+	seq.Index = 0
 }
 
 // HasTweens returns whether the Sequence is populated with Tweens or not.
@@ -197,21 +167,15 @@ func (s *Sequence) HasTweens() bool {
 	return len(s.Tweens) > 0
 }
 
-// IsReversed returns whether the Sequence currently running in reverse.
-func (s *Sequence) IsReversed() bool {
-	return s.Reversed
-}
-
 // SetReversed sets whether the Sequence will start running in reverse.
 func (s *Sequence) SetReversed(r bool) {
-	if s.index >= len(s.Tweens) || s.index < 0 {
-		s.index = s.clampIndex(s.index)
+	if s.Index >= len(s.Tweens) || s.Index < 0 {
+		s.Index = s.clampIndex(s.Index)
 	}
-	s.Tweens[s.index].Reversed = r
-	s.Reversed = r
+	s.Tweens[s.Index].Reversed = r
+	s.IsReversed = r
 }
 
-// clampIndex clamps the provided index to the bounds of the Tweens slice
 func (s *Sequence) clampIndex(index int) int {
 	if index < 0 {
 		return 0
@@ -222,7 +186,6 @@ func (s *Sequence) clampIndex(index int) int {
 	return index
 }
 
-// wrapIndex wraps the provided index when it is out of bounds, otherwise returns index.
 func (s *Sequence) wrapIndex(index int) int {
 	if index >= len(s.Tweens) {
 		return 0
