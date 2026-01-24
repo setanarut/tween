@@ -11,12 +11,12 @@ import (
 // Tween encapsulates the easing function along with timing data. This allows
 // a TweenFunc to be used to be easily animated.
 type Tween struct {
+	Value    float64
 	Begin    float64
 	End      float64
 	Duration time.Duration
 	Time     time.Duration
 	Overflow time.Duration
-	Value    float64
 
 	Reversed bool
 	Yoyo     bool

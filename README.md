@@ -8,30 +8,30 @@ interface, and it comes with several easing functions.
 Tween usage
 
 ```Go
-// tween from 0 to 1 in 3 seconds
-tw := tween.NewTween(0, 1, 3, tween.Linear)
+func main() {
+	// tween from 0 to 1 in 3 seconds
+	tw := tween.NewTween(0, 1, 3*time.Second, tween.Linear, false)
 
-// advance by 1.5 seconds
-tw.Update(1.5)
+	// advance by 1.5 seconds
+	tw.Update(time.Millisecond * 1500)
 
-// get tween value at 1.5 seconds using Value()
-fmt.Println(tw.Value()) // 0.5
-```
-Sequence usage
+	// get tween value at 1.5 seconds
+	fmt.Println(tw.Value) // 0.5
 
-```Go
-// merge multiple tweens into a sequence
-sequence := tween.NewSequence(
-	tween.NewTween(0, 100, 3, tween.InCubic),
-	tween.NewTween(100, 40, 2, tween.OutCubic),
-	tween.NewTween(4, 100, 20, tween.InOutBounce),
-)
+	// merge multiple tweens into a sequence
+	sequence := tween.NewSequence(
+		tween.NewTween(0, 100, 3*time.Second, tween.InCubic, false),
+		tween.NewTween(100, 40, 2*time.Second, tween.OutCubic, false),
+		tween.NewTween(4, 100, 20*time.Second, tween.InOutBounce, false),
+	)
 
-// advance by 7.5 seconds
-sequence.Update(7.5)
+	// advance by 7.5 seconds
+	sequence.Update(time.Millisecond * 7500)
 
-// get sequence value at 7.5 seconds using Value()
-fmt.Println(sequence.Value()) // 5.3125
+	// get sequence value at 7.5 seconds
+	fmt.Println(sequence.Value) // 5.3125
+}
+
 ```
 
 See [examples](./examples/) folder for more examples.
