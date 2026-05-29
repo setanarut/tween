@@ -38,7 +38,7 @@ func main() {
 
 ```
 
-See [examples](./examples/) folder for more examples.
+See [_examples](./_examples/) folder for more examples.
 
 ## Easing functions
 
