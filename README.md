@@ -42,9 +42,7 @@ Easing functions are functions that express how slow/fast the interpolation happ
 
 ![tween-families](https://github.com/user-attachments/assets/b364ff8d-bc7b-4b35-82ac-d89bf0eec933)
 
-The easing functions can be found in the `ease` package.
-
-They can be divided into several families:
+The easing functions can be divided into several families:
 
 * `linear` is the simplest easing function, straight from one value to the other.
 * `quad`, `cubic`, `quart`, `quint`, `expo`, `sine` and `circle` are all "smooth" curves that will make transitions look natural.
