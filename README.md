@@ -1,4 +1,8 @@
-# Tween [![](https://godoc.org/github.com/setanarut/tween?status.svg)](http://godoc.org/github.com/setanarut/tween)
+[![GoDoc](https://godoc.org/github.com/setanarut/tween?status.svg)](https://pkg.go.dev/github.com/setanarut/tween)
+[![Go Report Card](https://goreportcard.com/badge/github.com/setanarut/tween)](https://goreportcard.com/report/github.com/setanarut/tween)
+[![Coverage Status](https://coveralls.io/repos/github/setanarut/tween/badge.svg?branch=main)](https://coveralls.io/github/setanarut/tween?branch=main)
+
+# Tween
 
 Tween is a small library to perform [tweening](https://en.wikipedia.org/wiki/Tweening) in Go. It has a minimal
 interface, and it comes with several easing functions.
