@@ -7,16 +7,16 @@ import (
 
 func TestNew(t *testing.T) {
 	duration := 10 * time.Second
-	tw := NewTween(0, 10, duration, "Linear", false)
+	tw := NewTween(1.3, 10, duration, "Linear", false)
 
-	if tw.Begin != 0 {
+	if tw.Begin != 1.3 {
 		t.Errorf("expected begin to be 0, got %v", tw.Begin)
 	}
 	if tw.End != 10 {
 		t.Errorf("expected end to be 10, got %v", tw.End)
 	}
-	if tw.Change() != 10 {
-		t.Errorf("expected change to be 10, got %v", tw.Change())
+	if tw.Change() != 8.7 {
+		t.Errorf("expected change to be 8.7, got %v", tw.Change())
 	}
 	if tw.Duration != duration {
 		t.Errorf("expected duration to be %v, got %v", duration, tw.Duration)
@@ -156,4 +156,17 @@ func TestTween_CanReverseFromStart(t *testing.T) {
 	if tw.Overflow != -1*time.Second {
 		t.Errorf("expected Overflow to be -1s, got %v", tw.Overflow)
 	}
+}
+func TestTween_Delay(t *testing.T) {
+	tw := NewTweenWithDelay(time.Second, 1.3, 10, 1*time.Second, "Linear", false)
+	tw.Update(time.Second / 2)
+
+	if tw.Value != 1.3 {
+		t.Errorf("Begin value is not 1.3")
+	}
+
+	if tw.TotalDuration() != time.Second*2 {
+		t.Errorf("total duration is not 2 seconds")
+	}
+
 }
