@@ -7,7 +7,7 @@ import (
 
 func TestNew(t *testing.T) {
 	duration := 10 * time.Second
-	tw := NewTween(1.3, 10, duration, "Linear", false)
+	tw := NewTween(1.3, 10, duration, 0, "Linear", false)
 
 	if tw.Begin != 1.3 {
 		t.Errorf("expected begin to be 0, got %v", tw.Begin)
@@ -33,7 +33,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestTween_Set(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 
 	tw.SetTime(2 * time.Second)
 	if tw.Value != 2 {
@@ -59,7 +59,7 @@ func TestTween_Set(t *testing.T) {
 }
 
 func TestTween_SetNeg(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 	tw.SetTime(2 * time.Second)
 
 	tw.SetTime(-1 * time.Second)
@@ -72,7 +72,7 @@ func TestTween_SetNeg(t *testing.T) {
 }
 
 func TestTween_SetReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 	tw.Reversed = true
 
 	tw.SetTime(2 * time.Second)
@@ -90,7 +90,7 @@ func TestTween_SetReverse(t *testing.T) {
 }
 
 func TestTween_Reset(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 	tw.SetTime(5 * time.Second)
 
 	tw.Reset()
@@ -106,7 +106,7 @@ func TestTween_Reset(t *testing.T) {
 }
 
 func TestTween_Update(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 
 	tw.Update(2 * time.Second)
 	if tw.Value != 2 {
@@ -123,7 +123,7 @@ func TestTween_Update(t *testing.T) {
 }
 
 func TestTween_CanReverse(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 	tw.Update(8 * time.Second)
 	tw.Reversed = true
 	tw.Update(2 * time.Second)
@@ -134,7 +134,7 @@ func TestTween_CanReverse(t *testing.T) {
 }
 
 func TestTween_Yoyo(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", true)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", true)
 
 	tw.Update(12 * time.Second)
 	if !tw.Reversed {
@@ -146,7 +146,7 @@ func TestTween_Yoyo(t *testing.T) {
 }
 
 func TestTween_CanReverseFromStart(t *testing.T) {
-	tw := NewTween(0, 10, 10*time.Second, "Linear", false)
+	tw := NewTween(0, 10, 10*time.Second, 0, "Linear", false)
 	tw.Reversed = true
 	tw.Update(1 * time.Second)
 
@@ -158,7 +158,7 @@ func TestTween_CanReverseFromStart(t *testing.T) {
 	}
 }
 func TestTween_Delay(t *testing.T) {
-	tw := NewTweenWithDelay(time.Second, 1.3, 10, 1*time.Second, "Linear", false)
+	tw := NewTween(1.3, 10, time.Second, time.Second, "Linear", false)
 	tw.Update(time.Second / 2)
 
 	if tw.Value != 1.3 {

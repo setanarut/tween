@@ -14,18 +14,18 @@ const FixedTimeStep = time.Second / 60
 // Tween encapsulates the easing function along with timing data. This allows
 // a TweenFunc to be used to be easily animated.
 type Tween struct {
-	Value    float64
+	Value float64
+	// Delay is the amount of time to wait before the tween begins animating.
+	// During the delay period Value holds Begin (or End if Reversed).
+	// Delay does NOT repeat on Yoyo direction changes — it only applies once
+	// at the very start (or after an explicit Reset).
+	Delay    time.Duration
 	Begin    float64
 	End      float64
 	Duration time.Duration
 	Time     time.Duration
 	Overflow time.Duration
 
-	// Delay is the amount of time to wait before the tween begins animating.
-	// During the delay period Value holds Begin (or End if Reversed).
-	// Delay does NOT repeat on Yoyo direction changes — it only applies once
-	// at the very start (or after an explicit Reset).
-	Delay        time.Duration
 	delayElapsed time.Duration
 	delayDone    bool
 
@@ -37,15 +37,16 @@ type Tween struct {
 	EaseName   string
 }
 
-// NewTween returns a new Tween given begin/end values, a duration, an easing
+// NewTween returns a new Tween given begin/end values, a duration, an inital delay, an easing
 // function name (from EaseMap), and a yoyo flag.
-func NewTween(begin, end float64, duration time.Duration, easeName string, yoyo bool) *Tween {
+func NewTween(begin, end float64, duration, initialDelay time.Duration, easeName string, yoyo bool) *Tween {
 	fn, ok := EaseMap[easeName]
 	if !ok {
 		fn = LinearFunc
 	}
 	return &Tween{
 		Value:      begin,
+		Delay:      initialDelay,
 		Begin:      begin,
 		End:        end,
 		Duration:   duration,
@@ -53,13 +54,6 @@ func NewTween(begin, end float64, duration time.Duration, easeName string, yoyo 
 		EaseName:   easeName,
 		Yoyo:       yoyo,
 	}
-}
-
-// NewTweenWithDelay is like NewTween but also sets an initial delay.
-func NewTweenWithDelay(delay time.Duration, begin, end float64, duration time.Duration, easeName string, yoyo bool) *Tween {
-	t := NewTween(begin, end, duration, easeName, yoyo)
-	t.Delay = delay
-	return t
 }
 
 func (t *Tween) UnmarshalJSON(data []byte) error {

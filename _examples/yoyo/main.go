@@ -11,7 +11,7 @@ import (
 func main() {
 
 	// Create Tween and enable Yoyo
-	tw := tween.NewTween(0, 10, time.Second*10, tween.Linear, true)
+	tw := tween.NewTween(0, 10, time.Second*10, 0, tween.Linear, true)
 	for range 20 {
 		fmt.Print(tw.Value)
 		fmt.Print(" ")

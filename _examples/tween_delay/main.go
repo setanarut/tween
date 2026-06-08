@@ -8,13 +8,14 @@ import (
 )
 
 func main() {
-	tw := tween.NewTweenWithDelay(time.Second, 1.345, 100, time.Second*3, tween.Linear, false)
-
-	var dt time.Duration
-	fmt.Println(tw.TotalDuration())
+	tw := tween.NewTween(1.345, 100, time.Second*3, time.Second, tween.Linear, false)
+	fmt.Println("Total Duration: ", tw.TotalDuration())
 	for range 100 {
-		dt += (time.Second / 60)
-		fmt.Println(tw.Value, tw.IsDelaying())
-		tw.Update(dt)
+		if tw.IsDelaying() {
+			fmt.Println(tw.Value, "Delaying")
+		} else {
+			fmt.Println(tw.Value)
+		}
+		tw.Update(tween.FixedTimeStep)
 	}
 }
