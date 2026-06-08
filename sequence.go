@@ -48,31 +48,33 @@ func (s *Sequence) Remove(index int) {
 
 // Update advances the sequence by dt. It drives the active tween forward.
 func (s *Sequence) Update(dt time.Duration) {
-	if !s.HasTweens() {
+	if len(s.Tweens) == 0 {
 		s.Value = 0
 		s.IsActiveTweenFinished = false
 		s.IsFinished = true
 		return
 	}
 
-	var completed []int
 	remaining := dt
+	completedAny := false
 
 	for {
-		s.Tweens[s.Index].Update(remaining)
+		activeTween := s.Tweens[s.Index]
+		activeTween.Update(remaining)
 
-		if !s.Tweens[s.Index].IsFinished() {
-			s.Value = s.Tweens[s.Index].Value
-			s.IsActiveTweenFinished = len(completed) > 0
+		if !activeTween.IsFinished() {
+			s.Value = activeTween.Value
+			s.IsActiveTweenFinished = completedAny
 			s.IsFinished = false
 			return
 		}
 
-		remaining = s.Tweens[s.Index].Overflow
+		remaining = activeTween.Overflow
 		if remaining < 0 {
 			remaining = -remaining
 		}
-		completed = append(completed, s.Index)
+
+		completedAny = true
 
 		nextIndex := s.Index
 		if s.IsReversed {
@@ -88,7 +90,7 @@ func (s *Sequence) Update(dt time.Duration) {
 					s.LoopRemaining--
 				}
 				if s.LoopRemaining == 0 || remaining == 0 {
-					s.Value = s.Tweens[s.Index].Begin
+					s.Value = activeTween.Begin
 					s.IsActiveTweenFinished = true
 					s.IsFinished = true
 					return
@@ -104,9 +106,9 @@ func (s *Sequence) Update(dt time.Duration) {
 			}
 			if s.LoopRemaining == 0 || remaining == 0 {
 				if s.IsReversed {
-					s.Value = s.Tweens[s.Index].Begin
+					s.Value = activeTween.Begin
 				} else {
-					s.Value = s.Tweens[s.Index].End
+					s.Value = activeTween.End
 				}
 				s.IsActiveTweenFinished = true
 				s.IsFinished = true
@@ -120,8 +122,9 @@ func (s *Sequence) Update(dt time.Duration) {
 		}
 
 		s.Index = nextIndex
-		s.Tweens[s.Index].Reversed = s.IsReversed
-		s.Tweens[s.Index].Reset()
+		nextTween := s.Tweens[s.Index]
+		nextTween.Reversed = s.IsReversed
+		nextTween.Reset()
 	}
 }
 
