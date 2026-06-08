@@ -14,7 +14,7 @@ Tween usage
 ```Go
 func main() {
 	// tween from 0 to 1 in 3 seconds
-	tw := tween.NewTween(0, 1, 3*time.Second, tween.Linear, false)
+	tw := tween.NewTween(0, 1, 3*time.Second, 0 tween.Linear, false)
 
 	// advance by 1.5 seconds
 	tw.Update(time.Millisecond * 1500)
@@ -24,9 +24,9 @@ func main() {
 
 	// merge multiple tweens into a sequence
 	sequence := tween.NewSequence(
-		tween.NewTween(0, 100, 3*time.Second, tween.InCubic, false),
-		tween.NewTween(100, 40, 2*time.Second, tween.OutCubic, false),
-		tween.NewTween(4, 100, 20*time.Second, tween.InOutBounce, false),
+		tween.NewTween(0, 100, 3*time.Second, 0 tween.InCubic, false),
+		tween.NewTween(100, 40, 2*time.Second, 0 tween.OutCubic, false),
+		tween.NewTween(4, 100, 20*time.Second, 0 tween.InOutBounce, false),
 	)
 
 	// advance by 7.5 seconds
