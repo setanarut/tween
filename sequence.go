@@ -125,11 +125,14 @@ func (s *Sequence) Update(dt time.Duration) {
 	}
 }
 
+// SetReversed changes the playback direction of the sequence.
+// It reverses both the overall sequence flow and the currently active tween.
 func (s *Sequence) SetReversed(r bool) {
 	s.Tweens[s.Index].Reversed = r
 	s.IsReversed = r
 }
 
+// ActiveTween returns active *Tween
 func (s *Sequence) ActiveTween() *Tween {
 	return s.Tweens[s.Index]
 }
