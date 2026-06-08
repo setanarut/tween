@@ -34,6 +34,9 @@ func main() {
 		for range int(seq.Value) {
 			fmt.Print("+")
 		}
+		if seq.ActiveTween().IsDelaying() {
+			fmt.Print("Delay!")
+		}
 		for range 90 {
 			fmt.Print(" ")
 		}

@@ -59,48 +59,6 @@ func (s *Sequence) Update(dt time.Duration) {
 	remaining := dt
 
 	for {
-		if s.Yoyo {
-			if s.Index < 0 {
-				s.IsReversed = false
-				s.Index = s.clampIndex(s.Index)
-				if s.LoopRemaining >= 1 {
-					s.LoopRemaining--
-				}
-				if s.LoopRemaining == 0 || remaining == 0 {
-					s.Value = s.Tweens[s.Index].Begin
-					s.IsActiveTweenFinished = len(completed) > 0
-					s.IsFinished = true
-					return
-				}
-				s.Tweens[s.Index].Reversed = s.IsReversed
-				s.Tweens[s.Index].Reset()
-			}
-			if s.Index >= len(s.Tweens) {
-				s.IsReversed = true
-				s.Index = s.clampIndex(s.Index)
-				s.Tweens[s.Index].Reversed = s.IsReversed
-				s.Tweens[s.Index].Reset()
-			}
-		} else if s.Index >= len(s.Tweens) || s.Index <= -1 {
-			if s.LoopRemaining >= 1 {
-				s.LoopRemaining--
-			}
-			if s.LoopRemaining == 0 || remaining == 0 {
-				idx := s.clampIndex(s.Index)
-				if s.IsReversed {
-					s.Value = s.Tweens[idx].Begin
-				} else {
-					s.Value = s.Tweens[idx].End
-				}
-				s.IsActiveTweenFinished = len(completed) > 0
-				s.IsFinished = true
-				return
-			}
-			s.Index = s.wrapIndex(s.Index)
-			s.Tweens[s.Index].Reversed = s.IsReversed
-			s.Tweens[s.Index].Reset()
-		}
-
 		s.Tweens[s.Index].Update(remaining)
 
 		if !s.Tweens[s.Index].IsFinished() {
@@ -116,16 +74,64 @@ func (s *Sequence) Update(dt time.Duration) {
 		}
 		completed = append(completed, s.Index)
 
+		nextIndex := s.Index
 		if s.IsReversed {
-			s.Index--
+			nextIndex--
 		} else {
-			s.Index++
+			nextIndex++
 		}
-		if s.Index < len(s.Tweens) && s.Index >= 0 {
-			s.Tweens[s.Index].Reversed = s.IsReversed
-			s.Tweens[s.Index].Reset()
+
+		if s.Yoyo {
+			if nextIndex < 0 {
+				s.IsReversed = false
+				if s.LoopRemaining >= 1 {
+					s.LoopRemaining--
+				}
+				if s.LoopRemaining == 0 || remaining == 0 {
+					s.Value = s.Tweens[s.Index].Begin
+					s.IsActiveTweenFinished = true
+					s.IsFinished = true
+					return
+				}
+				nextIndex = 0
+			} else if nextIndex >= len(s.Tweens) {
+				s.IsReversed = true
+				nextIndex = len(s.Tweens) - 1
+			}
+		} else if nextIndex >= len(s.Tweens) || nextIndex < 0 {
+			if s.LoopRemaining >= 1 {
+				s.LoopRemaining--
+			}
+			if s.LoopRemaining == 0 || remaining == 0 {
+				if s.IsReversed {
+					s.Value = s.Tweens[s.Index].Begin
+				} else {
+					s.Value = s.Tweens[s.Index].End
+				}
+				s.IsActiveTweenFinished = true
+				s.IsFinished = true
+				return
+			}
+			if nextIndex >= len(s.Tweens) {
+				nextIndex = 0
+			} else {
+				nextIndex = len(s.Tweens) - 1
+			}
 		}
+
+		s.Index = nextIndex
+		s.Tweens[s.Index].Reversed = s.IsReversed
+		s.Tweens[s.Index].Reset()
 	}
+}
+
+func (s *Sequence) SetReversed(r bool) {
+	s.Tweens[s.Index].Reversed = r
+	s.IsReversed = r
+}
+
+func (s *Sequence) ActiveTween() *Tween {
+	return s.Tweens[s.Index]
 }
 
 // TotalDuration returns the total animation duration by summing each tween's
@@ -166,33 +172,4 @@ func (s *Sequence) Reset() {
 // HasTweens reports whether the Sequence contains any Tweens.
 func (s *Sequence) HasTweens() bool {
 	return len(s.Tweens) > 0
-}
-
-// SetReversed configures the playback direction.
-func (s *Sequence) SetReversed(r bool) {
-	if s.Index >= len(s.Tweens) || s.Index < 0 {
-		s.Index = s.clampIndex(s.Index)
-	}
-	s.Tweens[s.Index].Reversed = r
-	s.IsReversed = r
-}
-
-func (s *Sequence) clampIndex(index int) int {
-	if index < 0 {
-		return 0
-	}
-	if index >= len(s.Tweens) {
-		return len(s.Tweens) - 1
-	}
-	return index
-}
-
-func (s *Sequence) wrapIndex(index int) int {
-	if index >= len(s.Tweens) {
-		return 0
-	}
-	if index < 0 {
-		return len(s.Tweens) - 1
-	}
-	return index
 }
