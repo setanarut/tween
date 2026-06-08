@@ -22,7 +22,7 @@ func main() {
 			2,
 			90,
 			time.Second*3,
-			time.Second, // delay
+			time.Second, // inital delay
 			tween.InCubic,
 			false,
 		),

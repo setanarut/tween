@@ -14,12 +14,6 @@ type Sequence struct {
 	// IsReversed runs the sequence backwards when true.
 	IsReversed bool
 
-	// Delay is the amount of time to wait before the very first tween starts.
-	// It is re-armed by Reset. It does NOT fire again on Yoyo reversal.
-	Delay        time.Duration
-	delayElapsed time.Duration
-	delayDone    bool
-
 	Index int
 	// Loop is the canonical loop count (0 = infinite).
 	Loop int
@@ -40,15 +34,6 @@ func NewSequence(tweens ...*Tween) *Sequence {
 	}
 }
 
-// NewSequenceWithDelay returns a new Sequence with an initial delay before the
-// first tween begins.
-func NewSequenceWithDelay(delay time.Duration, tweens ...*Tween) *Sequence {
-	s := NewSequence(tweens...)
-	s.Delay = delay
-	s.delayDone = delay <= 0
-	return s
-}
-
 // Add appends one or more Tweens to the end of the Sequence.
 func (s *Sequence) Add(tweens ...*Tween) {
 	s.Tweens = append(s.Tweens, tweens...)
@@ -61,8 +46,7 @@ func (s *Sequence) Remove(index int) {
 	}
 }
 
-// Update advances the sequence by dt. It first consumes any remaining
-// sequence-level delay, then drives the active tween forward.
+// Update advances the sequence by dt. It drives the active tween forward.
 func (s *Sequence) Update(dt time.Duration) {
 	if !s.HasTweens() {
 		s.Value = 0
@@ -71,26 +55,6 @@ func (s *Sequence) Update(dt time.Duration) {
 		return
 	}
 
-	// --- consume sequence-level delay ---
-	if !s.delayDone {
-		remaining := s.Delay - s.delayElapsed
-		if dt < remaining {
-			s.delayElapsed += dt
-			s.IsFinished = false
-			s.IsActiveTweenFinished = false
-			return
-		}
-		dt -= remaining
-		s.delayElapsed = s.Delay
-		s.delayDone = true
-		if dt == 0 {
-			s.IsFinished = false
-			s.IsActiveTweenFinished = false
-			return
-		}
-	}
-
-	// --- drive tweens ---
 	var completed []int
 	remaining := dt
 
@@ -164,20 +128,14 @@ func (s *Sequence) Update(dt time.Duration) {
 	}
 }
 
-// Duration returns the total animation duration by summing each tween's
-// TotalDuration (Delay + Duration). The sequence-level Delay is NOT included
-// here; use TotalDuration for the full wall-clock length.
-func (s *Sequence) Duration() time.Duration {
+// TotalDuration returns the total animation duration by summing each tween's
+// TotalDuration (Delay + TotalDuration).
+func (s *Sequence) TotalDuration() time.Duration {
 	var total time.Duration
 	for _, t := range s.Tweens {
 		total += t.TotalDuration()
 	}
 	return total
-}
-
-// TotalDuration returns the sequence-level Delay plus the summed tween durations.
-func (s *Sequence) TotalDuration() time.Duration {
-	return s.Delay + s.Duration()
 }
 
 // SetIndex resets the current tween and moves the active index.
@@ -193,16 +151,12 @@ func (s *Sequence) SetLoop(amount int) {
 	s.LoopRemaining = amount
 }
 
-// Reset resets the sequence and all contained tweens to their initial state,
-// and re-arms the sequence-level delay.
+// Reset resets the sequence and all contained tweens to their initial state.
 func (s *Sequence) Reset() {
 	s.LoopRemaining = s.Loop
 	s.Index = 0
 	s.IsFinished = false
 	s.IsActiveTweenFinished = false
-
-	s.delayDone = s.Delay <= 0
-	s.delayElapsed = 0
 
 	for _, t := range s.Tweens {
 		t.Reset()
@@ -212,11 +166,6 @@ func (s *Sequence) Reset() {
 // HasTweens reports whether the Sequence contains any Tweens.
 func (s *Sequence) HasTweens() bool {
 	return len(s.Tweens) > 0
-}
-
-// IsDelaying reports whether the sequence-level delay is still counting down.
-func (s *Sequence) IsDelaying() bool {
-	return !s.delayDone
 }
 
 // SetReversed configures the playback direction.
