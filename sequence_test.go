@@ -7,8 +7,8 @@ import (
 
 func TestSequence_BasicFlow(t *testing.T) {
 	s := NewSequence(
-		NewTween(0, 10, 1*time.Second, "Linear", false),
-		NewTween(10, 20, 1*time.Second, "Linear", false),
+		NewTween(0, 10, 1*time.Second, 0, "Linear", false),
+		NewTween(10, 20, 1*time.Second, 0, "Linear", false),
 	)
 
 	s.Update(1500 * time.Millisecond)
@@ -22,7 +22,7 @@ func TestSequence_BasicFlow(t *testing.T) {
 }
 
 func TestSequence_Loop(t *testing.T) {
-	s := NewSequence(NewTween(0, 10, 1*time.Second, "Linear", false))
+	s := NewSequence(NewTween(0, 10, 1*time.Second, 0, "Linear", false))
 	s.SetLoop(2)
 
 	s.Update(1500 * time.Millisecond)
@@ -38,8 +38,8 @@ func TestSequence_Loop(t *testing.T) {
 
 func TestSequence_Reverse(t *testing.T) {
 	s := NewSequence(
-		NewTween(0, 10, 1*time.Second, "Linear", false),
-		NewTween(10, 20, 1*time.Second, "Linear", false),
+		NewTween(0, 10, 1*time.Second, 0, "Linear", false),
+		NewTween(10, 20, 1*time.Second, 0, "Linear", false),
 	)
 	s.SetReversed(true)
 	s.Index = 1
@@ -52,7 +52,7 @@ func TestSequence_Reverse(t *testing.T) {
 }
 
 func TestSequence_Yoyo(t *testing.T) {
-	s := NewSequence(NewTween(0, 10, 1*time.Second, "Linear", false))
+	s := NewSequence(NewTween(0, 10, 1*time.Second, 0, "Linear", false))
 	s.Yoyo = true
 
 	s.Update(1500 * time.Millisecond)
@@ -66,9 +66,9 @@ func TestSequence_Yoyo(t *testing.T) {
 
 func TestSequence_LargeOverflow(t *testing.T) {
 	s := NewSequence(
-		NewTween(0, 10, 1*time.Second, "Linear", false),
-		NewTween(10, 20, 1*time.Second, "Linear", false),
-		NewTween(20, 30, 1*time.Second, "Linear", false),
+		NewTween(0, 10, 1*time.Second, 0, "Linear", false),
+		NewTween(10, 20, 1*time.Second, 0, "Linear", false),
+		NewTween(20, 30, 1*time.Second, 0, "Linear", false),
 	)
 
 	s.Update(2500 * time.Millisecond)

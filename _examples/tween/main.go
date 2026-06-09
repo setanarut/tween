@@ -7,15 +7,15 @@ import (
 )
 
 func main() {
-	t := tween.NewTween(0, 90, time.Second*20, tween.InBounce, false)
-
-	for range 20 {
-		t.Update(time.Second)
-		n := int(t.Value)
+	tw := tween.NewTween(0, 100, time.Second*3, 0, tween.InBounce, false)
+	lines := 20
+	for range lines {
+		tw.Update(tw.TotalDuration() / time.Duration(lines))
+		n := int(tw.Value)
 		for range n {
 			print("x")
 		}
-		for j := n; j < int(t.End); j++ {
+		for j := n; j < int(tw.End); j++ {
 			print(" ")
 		}
 		print("\n")
